@@ -1,7 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Grid } from 'semantic-ui-react';
 import cn from 'classnames';
 import './cell.css';
+
+const styles = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  padding: '14px 10px',
+};
 
 const CalendarCell = ({
   end,
@@ -15,7 +23,8 @@ const CalendarCell = ({
   today,
   ...otherProps
 }) => (
-  <span
+  <Grid.Column
+    style={styles}
     className={cn('clndr-cell', {
       'clndr-cell-today': today,
       'clndr-cell-disabled': !selectable,

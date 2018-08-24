@@ -1,16 +1,27 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import cn from 'classnames';
-import { Segment } from 'semantic-ui-react';
+import { Grid, Segment } from 'semantic-ui-react';
 import Button from '../button';
 import TodayButton from '../today-button';
-import CalendarCell from '../cell';
 import { getToday } from '../../utils';
+import Weeks from './weeks';
+import Weekdays from './weekdays';
 import './calendar.css';
 
 const styles = {
   leftBtn: { textAlign: 'start' },
   rightBtn: { textAlign: 'end' },
+  nextYear: { marginRight: 0 },
+  previousMonth: { marginRight: 0 },
+  grid: { padding: '0 1em 1em' },
+  gridRow: { padding: 0 },
+  calendarDays: {
+    backgroundColor: 'rgba(0, 0, 0, 0.1)',
+    border: '1px solid rgba(0, 0, 0, 0.1)',
+    borderRadius: '0.28571429rem',
+    overflow: 'hidden',
+  },
 };
 
 const pointings = {
@@ -55,7 +66,7 @@ const Calendar = ({
                   />
                   <Button
                     icon="angle left"
-                    style={{ marginRight: 0 }}
+                    style={styles.previousMonth}
                     title={previousMonth}
                     {...getBackProps({ calendars })}
                   />
@@ -77,7 +88,7 @@ const Calendar = ({
                   />
                   <Button
                     icon="angle double right"
-                    style={{ marginRight: 0 }}
+                    style={styles.nextYear}
                     title={nextYear}
                     {...getForwardProps({ calendars, offset: 12 })}
                   />
@@ -85,32 +96,11 @@ const Calendar = ({
               )}
             </div>
           </div>
-          <div className="clndr-days">
-            {weekdays.map(weekday => (
-              <CalendarCell
-                key={`${calendar.year}-${calendar.month}-${weekday}`}
-                title={weekday}
-              >
-                {weekday.slice(0, 2)}
-              </CalendarCell>
-            ))}
-            {calendar.weeks.map(week =>
-              week.map((dateObj, weekIdx) => {
-                const key = `${calendar.year}-${calendar.month}-${weekIdx}`;
-
-                return dateObj ? (
-                  <CalendarCell
-                    key={key}
-                    {...dateObj}
-                    {...getDateProps({ dateObj })}
-                  >
-                    {dateObj.date.getDate()}
-                  </CalendarCell>
-                ) : (
-                  <CalendarCell key={key} />
-                );
-              })
-            )}
+          <div style={styles.calendarDays}>
+            <Grid columns={7} divided style={styles.grid}>
+              <Weekdays calendar={calendar} weekdays={weekdays} />
+              <Weeks calendar={calendar} getDateProps={getDateProps} />
+            </Grid>
           </div>
         </div>
       ))}
