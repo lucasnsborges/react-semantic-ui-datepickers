@@ -1,6 +1,5 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
-import cn from 'classnames';
 import { Grid, Segment } from 'semantic-ui-react';
 import Button from '../button';
 import TodayButton from '../today-button';
@@ -16,19 +15,32 @@ const styles = {
   previousMonth: { marginRight: 0 },
   grid: { padding: '0 1em 1em' },
   gridRow: { padding: 0 },
+  calendarWrapper: { flexWrap: 'nowrap' },
   calendarDays: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
     border: '1px solid rgba(0, 0, 0, 0.1)',
     borderRadius: '0.28571429rem',
     overflow: 'hidden',
   },
-};
-
-const pointings = {
-  'top left': 'clndr-top clndr-left',
-  'top right': 'clndr-top clndr-right',
-  left: 'clndr-left',
-  right: 'clndr-right',
+  segment: pointing => ({
+    marginBottom: '0.3rem',
+    marginTop: '0.25rem',
+    position: 'absolute',
+    textAlign: 'center',
+    zIndex: 2000,
+    ...pointing.split(' ').reduce((acc, cur) => {
+      switch (cur) {
+        case 'top':
+          return { ...acc, bottom: '100%' };
+        case 'bottom':
+          return { ...acc, top: '100%' };
+        case 'right':
+          return { ...acc, right: 0 };
+        default:
+          return { ...acc, left: 0 };
+      }
+    }, {}),
+  }),
 };
 
 const Calendar = ({
@@ -48,63 +60,62 @@ const Calendar = ({
   weekdays,
   pointing,
 }) => (
-  <Segment className={cn('clndr-calendars-segment', pointings[pointing])}>
-    <div
-      className="clndr-calendars-wrapper"
-      style={{ '--n': calendars.length }}
-    >
-      {calendars.map((calendar, calendarIdx) => (
-        <div key={`${calendar.year}-${calendar.month}`}>
-          <div className="clndr-control">
-            <div style={styles.leftBtn}>
-              {calendarIdx === 0 && (
-                <Fragment>
-                  <Button
-                    icon="angle double left"
-                    title={previousYear}
-                    {...getBackProps({ calendars, offset: 12 })}
-                  />
-                  <Button
-                    icon="angle left"
-                    style={styles.previousMonth}
-                    title={previousMonth}
-                    {...getBackProps({ calendars })}
-                  />
-                </Fragment>
-              )}
-            </div>
+  <Segment style={styles.segment(pointing)}>
+    <Grid columns={calendars.length}>
+      <Grid.Row style={styles.calendarWrapper}>
+        {calendars.map((calendar, calendarIdx) => (
+          <Grid.Column key={`${calendar.year}-${calendar.month}`}>
+            <div className="clndr-control">
+              <div style={styles.leftBtn}>
+                {calendarIdx === 0 && (
+                  <Fragment>
+                    <Button
+                      icon="angle double left"
+                      title={previousYear}
+                      {...getBackProps({ calendars, offset: 12 })}
+                    />
+                    <Button
+                      icon="angle left"
+                      style={styles.previousMonth}
+                      title={previousMonth}
+                      {...getBackProps({ calendars })}
+                    />
+                  </Fragment>
+                )}
+              </div>
 
-            <span title={`${months[calendar.month]} ${calendar.year}`}>
-              {months[calendar.month].slice(0, 3)} {calendar.year}
-            </span>
+              <span title={`${months[calendar.month]} ${calendar.year}`}>
+                {months[calendar.month].slice(0, 3)} {calendar.year}
+              </span>
 
-            <div style={styles.rightBtn}>
-              {calendarIdx === calendars.length - 1 && (
-                <Fragment>
-                  <Button
-                    icon="angle right"
-                    title={nextMonth}
-                    {...getForwardProps({ calendars })}
-                  />
-                  <Button
-                    icon="angle double right"
-                    style={styles.nextYear}
-                    title={nextYear}
-                    {...getForwardProps({ calendars, offset: 12 })}
-                  />
-                </Fragment>
-              )}
+              <div style={styles.rightBtn}>
+                {calendarIdx === calendars.length - 1 && (
+                  <Fragment>
+                    <Button
+                      icon="angle right"
+                      title={nextMonth}
+                      {...getForwardProps({ calendars })}
+                    />
+                    <Button
+                      icon="angle double right"
+                      style={styles.nextYear}
+                      title={nextYear}
+                      {...getForwardProps({ calendars, offset: 12 })}
+                    />
+                  </Fragment>
+                )}
+              </div>
             </div>
-          </div>
-          <div style={styles.calendarDays}>
-            <Grid columns={7} divided style={styles.grid}>
-              <Weekdays calendar={calendar} weekdays={weekdays} />
-              <Weeks calendar={calendar} getDateProps={getDateProps} />
-            </Grid>
-          </div>
-        </div>
-      ))}
-    </div>
+            <div style={styles.calendarDays}>
+              <Grid columns={7} divided style={styles.grid}>
+                <Weekdays calendar={calendar} weekdays={weekdays} />
+                <Weeks calendar={calendar} getDateProps={getDateProps} />
+              </Grid>
+            </div>
+          </Grid.Column>
+        ))}
+      </Grid.Row>
+    </Grid>
     {showToday && (
       <TodayButton
         {...getToday(minDate, maxDate)}
