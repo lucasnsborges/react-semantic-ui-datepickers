@@ -6,15 +6,16 @@ import TodayButton from '../today-button';
 import { getToday } from '../../utils';
 import Weeks from './weeks';
 import Weekdays from './weekdays';
-import './calendar.css';
 
 const styles = {
-  leftBtn: { textAlign: 'start' },
-  rightBtn: { textAlign: 'end' },
+  leftBtn: { display: 'flex', textAlign: 'start' },
+  rightBtn: { display: 'flex', textAlign: 'end' },
   nextYear: { marginRight: 0 },
   previousMonth: { marginRight: 0 },
   grid: { padding: '0 1em 1em' },
   gridRow: { padding: 0 },
+  gridRowControl: { marginBottom: '1rem' },
+  notFirstCalendar: { paddingLeft: 0 },
   calendarWrapper: { flexWrap: 'nowrap' },
   calendarDays: {
     backgroundColor: 'rgba(0, 0, 0, 0.1)',
@@ -64,48 +65,56 @@ const Calendar = ({
     <Grid columns={calendars.length}>
       <Grid.Row style={styles.calendarWrapper}>
         {calendars.map((calendar, calendarIdx) => (
-          <Grid.Column key={`${calendar.year}-${calendar.month}`}>
-            <div className="clndr-control">
-              <div style={styles.leftBtn}>
-                {calendarIdx === 0 && (
-                  <Fragment>
-                    <Button
-                      icon="angle double left"
-                      title={previousYear}
-                      {...getBackProps({ calendars, offset: 12 })}
-                    />
-                    <Button
-                      icon="angle left"
-                      style={styles.previousMonth}
-                      title={previousMonth}
-                      {...getBackProps({ calendars })}
-                    />
-                  </Fragment>
-                )}
-              </div>
+          <Grid.Column
+            key={`${calendar.year}-${calendar.month}`}
+            style={calendarIdx > 0 ? styles.notFirstCalendar : {}}
+          >
+            <Grid columns={3}>
+              <Grid.Row style={styles.gridRowControl}>
+                <Grid.Column style={styles.leftBtn}>
+                  {calendarIdx === 0 && (
+                    <Fragment>
+                      <Button
+                        icon="angle double left"
+                        title={previousYear}
+                        {...getBackProps({ calendars, offset: 12 })}
+                      />
+                      <Button
+                        icon="angle left"
+                        style={styles.previousMonth}
+                        title={previousMonth}
+                        {...getBackProps({ calendars })}
+                      />
+                    </Fragment>
+                  )}
+                </Grid.Column>
 
-              <span title={`${months[calendar.month]} ${calendar.year}`}>
-                {months[calendar.month].slice(0, 3)} {calendar.year}
-              </span>
+                <Grid.Column
+                  title={`${months[calendar.month]} ${calendar.year}`}
+                  verticalAlign="middle"
+                >
+                  {months[calendar.month].slice(0, 3)} {calendar.year}
+                </Grid.Column>
 
-              <div style={styles.rightBtn}>
-                {calendarIdx === calendars.length - 1 && (
-                  <Fragment>
-                    <Button
-                      icon="angle right"
-                      title={nextMonth}
-                      {...getForwardProps({ calendars })}
-                    />
-                    <Button
-                      icon="angle double right"
-                      style={styles.nextYear}
-                      title={nextYear}
-                      {...getForwardProps({ calendars, offset: 12 })}
-                    />
-                  </Fragment>
-                )}
-              </div>
-            </div>
+                <Grid.Column style={styles.rightBtn}>
+                  {calendarIdx === calendars.length - 1 && (
+                    <Fragment>
+                      <Button
+                        icon="angle right"
+                        title={nextMonth}
+                        {...getForwardProps({ calendars })}
+                      />
+                      <Button
+                        icon="angle double right"
+                        style={styles.nextYear}
+                        title={nextYear}
+                        {...getForwardProps({ calendars, offset: 12 })}
+                      />
+                    </Fragment>
+                  )}
+                </Grid.Column>
+              </Grid.Row>
+            </Grid>
             <div style={styles.calendarDays}>
               <Grid columns={7} divided style={styles.grid}>
                 <Weekdays calendar={calendar} weekdays={weekdays} />
